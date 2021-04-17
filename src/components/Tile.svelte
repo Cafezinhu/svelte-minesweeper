@@ -7,6 +7,7 @@
     export let x: number, y: number;
 
     let exploded = false;
+    let flag = false;
 
     const dispatch = createEventDispatcher();
 
@@ -24,13 +25,18 @@
     }
 
     const click = () => {
-        if(!sweeped){
+        if(!sweeped && !flag){
             if(value === '💣') exploded = true;
             dispatch('sweep', {
                 x, y 
             });
         }
     }
+
+    const rightClick = (e: MouseEvent) => {
+        e.preventDefault();
+        flag = !flag;
+    };
 </script>
 
 <style>
@@ -59,6 +65,7 @@
 
 <p class={`${sweeped ? 'exposed' : 'hidden'} ${exploded ? 'exploded' : ''}` } 
     style="--color: {colors[value]}"
-    on:click={click}>
-    {sweeped ? (value !== '0' ? value : '⠀') : '⠀'}
+    on:click={click}
+    on:contextmenu={rightClick}>
+    {flag ? '🚩' : sweeped ? (value !== '0' ? value : '⠀') : '⠀'}
 </p>

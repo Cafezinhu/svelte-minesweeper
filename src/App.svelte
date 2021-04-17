@@ -8,6 +8,8 @@ import Game from "./components/Game.svelte";
     #app{
         height: 100%;
         background-color: rgb(78, 78, 78);
+        display: grid;
+        place-items: center;
     }
 </style>
 
