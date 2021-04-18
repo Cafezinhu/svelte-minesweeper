@@ -3,11 +3,20 @@
 
     export let value: string;
     export let sweeped: boolean;
+    export let isGameDone: boolean;
+    export let newGame: boolean;
+
 
     export let x: number, y: number;
 
     let exploded = false;
     let flag = false;
+
+    $: if(newGame){
+        exploded = false;
+        flag = false;
+    }
+    
 
     const dispatch = createEventDispatcher();
 
@@ -25,7 +34,7 @@
     }
 
     const click = () => {
-        if(!sweeped && !flag){
+        if(!sweeped && !flag && !isGameDone){
             if(value === '💣') exploded = true;
             dispatch('sweep', {
                 x, y 
@@ -35,7 +44,9 @@
 
     const rightClick = (e: MouseEvent) => {
         e.preventDefault();
-        flag = !flag;
+        if(!isGameDone && !sweeped){
+            flag = !flag;
+        }
     };
 </script>
 
@@ -63,9 +74,10 @@
     }
 </style>
 
-<p class={`${sweeped ? 'exposed' : 'hidden'} ${exploded ? 'exploded' : ''}` } 
+<p 
+    class={`${sweeped ? 'exposed' : 'hidden'} ${exploded ? 'exploded' : ''}` } 
     style="--color: {colors[value]}"
     on:click={click}
     on:contextmenu={rightClick}>
-    {flag ? '🚩' : sweeped ? (value !== '0' ? value : '⠀') : '⠀'}
+        {flag ? '🚩' : sweeped ? (value !== '0' ? value : '⠀') : '⠀'}
 </p>

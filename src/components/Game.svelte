@@ -4,12 +4,19 @@
     import Tile from "./Tile.svelte";
 
 
-    let columns = 12;
-    let rows = 12;
-    let mines = 15;
+    let columns = 10;
+    let rows = 10;
+    let mines = 10;
+
+    let opennedTiles: number;
+    let lost: boolean;
+    let restarted: boolean;
 
     const createGame = (columns: number, rows: number, mineCount: number):ITile[][] => {
         let newGame: ITile[][] = [];
+        opennedTiles = 0;
+        lost = false;
+        restarted = true;
 
         let tiles: {x: number, y: number}[] = [];
 
@@ -55,11 +62,13 @@
     let game = createGame(columns, rows, mines);
 
     const sweep = (e:CustomEvent<{x: number, y: number}>) => {
+        restarted = false;
         const {x, y} = e.detail;
         expose(x, y);
     }
 
     const expose = (x: number, y: number) => {
+        opennedTiles++;
         game[x][y].sweeped = true;
         
         let value = game[x][y].value
@@ -68,6 +77,7 @@
     }
 
     const exposeMines = () => {
+        lost = true;
         game = game.map(row => {
             return row.map(tile => {
                 return {...tile, sweeped: tile.value === '💣' ? true : tile.sweeped}
@@ -93,19 +103,70 @@
 
 <style>
     #minefield{
-        height: 35em;
-        width: 35em;
+        height: 70vh;
+        width: 70vh;
         border: .3em solid white;
         border-radius: .2em;
         display: grid;
         grid-template-columns: repeat(var(--columns), 1fr);
     }
+
+    #announcement{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2em;
+    }
+
+    #announcement p{
+        color: white;
+        font-size: 2em;
+    }
+
+    #announcement p span{
+        color: var(--color);
+    }
+
+    #restart{
+        color: white;
+        background-color: rgb(3, 101, 167);
+        padding: .2em .6em;
+        cursor: pointer;
+        user-select: none;
+        border-radius: 1em;
+    }
 </style>
 
-<div id="minefield" style="--columns: {columns}">
-    {#each game as row, x}
-        {#each row as tile, y}
-            <Tile value={tile.value} sweeped={tile.sweeped} x={x} y={y} on:sweep={sweep}/>
+<div>
+    {#if opennedTiles >= rows * columns - mines || lost}
+        <div id="announcement">
+            <p> 
+                You 
+                <span 
+                    style="--color: {lost ? 'red' : 'lime'}">
+                    {`${lost ? 'lost' : 'won'}!`}
+                </span>
+            </p>
+            <p 
+                id="restart"
+                on:click={() => {game = createGame(columns, rows, mines)}}>
+            Restart</p>
+        </div>
+    {/if}
+
+    <div id="minefield" style="--columns: {columns}">
+        {#each game as row, x}
+            {#each row as tile, y}
+                <Tile 
+                    value={tile.value} 
+                    sweeped={tile.sweeped} 
+                    x={x} 
+                    y={y} 
+                    on:sweep={sweep} 
+                    isGameDone={opennedTiles >= rows * columns - mines || lost}
+                    newGame={restarted} 
+                />
+            {/each}
         {/each}
-    {/each}
+    </div>
 </div>
