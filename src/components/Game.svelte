@@ -135,6 +135,13 @@
         user-select: none;
         border-radius: 1em;
     }
+
+    @media (orientation: portrait){
+        #minefield{
+            height: 70vw;
+            width: 70vw;
+        }
+    }
 </style>
 
 <div>

@@ -42,8 +42,7 @@
         }
     }
 
-    const rightClick = (e: MouseEvent) => {
-        e.preventDefault();
+    const rightClick = () => {
         if(!isGameDone && !sweeped){
             flag = !flag;
         }
@@ -52,11 +51,10 @@
 
 <style>
     p{
-        /* height: 100%; */
         margin: 0;
         display: grid;
         place-items: center;
-        font-size: 2em;     
+        font-size: 4vh;
         color: var(--color);
         user-select: none;
     }
@@ -72,12 +70,18 @@
     .exploded{
         background-color: red;
     }
+
+    @media (orientation: portrait){
+        p{
+            font-size: 4vw;
+        }
+    }
 </style>
 
 <p 
     class={`${sweeped ? 'exposed' : 'hidden'} ${exploded ? 'exploded' : ''}` } 
     style="--color: {colors[value]}"
     on:click={click}
-    on:contextmenu={rightClick}>
+    on:contextmenu|preventDefault={rightClick}>
         {flag ? '🚩' : sweeped ? (value !== '0' ? value : '⠀') : '⠀'}
 </p>
